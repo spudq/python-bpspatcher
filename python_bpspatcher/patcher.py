@@ -101,6 +101,9 @@ class BPSPatch(object):
         source_relative_offset = 0
         target_relative_offset = 0
 
+        # Assuming target_size is the total length to process
+        total_length = self.target_size
+
         while(True):
             action = read_number_io(actions)
             if action is None:
@@ -109,7 +112,7 @@ class BPSPatch(object):
             command = action & 3
             length = (action >> 2) + 1
 
-            print(f"Command {command}, length {length}")
+            msg = f"Command {command}, length {length}"
 
             if command == Action.SourceRead:
                 # consume some number of bytes from source file
@@ -147,6 +150,10 @@ class BPSPatch(object):
                     output_offset += 1
                     target_relative_offset += 1
 
+            # Print progress
+            progress = (output_offset / total_length) * 100
+            print(f"\rPatch Progress: {progress:.2f}% - " + msg, end='')
+
         target_checksum = binascii.crc32(target)
 
         if target_checksum != self.target_checksum:
@@ -154,6 +161,7 @@ class BPSPatch(object):
                 f"target checksum {target_checksum} does not match "
                 f"expected {self.target_checksum}")
 
+        print("")  # add a newline after the progress is done
         return target
 
 

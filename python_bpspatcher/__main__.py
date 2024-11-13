@@ -30,14 +30,20 @@ def main():
 
     op = os.path.join(p, pn + e)
 
+    print (f'Reading: "{args.InputBPS}"')
+
     with open(args.InputBPS, "rb") as f:
         base_patch = f.read()
+
+    print (f'Reading: "{args.InputRom}"')
 
     with open(args.InputRom, "rb") as f:
         source = f.read()
 
     instance = patcher.BPSPatch(base_patch)
     base_patched = instance.patch_rom(source)
+
+    print (f'Writing: "{op}"')
 
     with open(op, "wb") as f:
         f.write(base_patched)
